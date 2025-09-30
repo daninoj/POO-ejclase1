@@ -6,9 +6,9 @@ Parte A: Conceptos y lectura de código
 Parte B: Encapsulación con @property y validación  
 Parte C: Diseño y refactor  
 
-==========================================
+
 Parte A – Conceptos y lectura de código
-==========================================
+
 
 1. Atributos accesibles  
 Existen a.x, a._y, a._A__z. El a.__z no es accesible directamente.  
@@ -41,9 +41,9 @@ Se accede con s._S__data.
 
 10. Uso de dir()  
 Aparece _D__a (forma mangleada de __a).  
-=======================================
+
 Parte B – Encapsulación con @property
-=======================================
+
 
 11. Cuenta  
 Validar que saldo ≥ 0; si es negativo, lanza ValueError.  
@@ -57,9 +57,9 @@ nombre siempre debe ser str, de lo contrario lanza TypeError.
 14. Registro  
 La lista interna se expone como tupla inmutable (tuple).  
 
-=================================
+
 Parte C – Diseño y refactor
-=================================
+
 
 15. Motor  
 Velocidad validada entre 0 y 200.  
