@@ -1,0 +1,80 @@
+# Autor: Daniel Niño
+"""
+Parte B - Encapsulación con @property y validación
+Taller POO en Python
+"""
+
+# 11) Completar propiedad con validación
+class Cuenta:
+    def __init__(self, saldo):
+        self._saldo = 0
+        self.saldo = saldo
+
+    @property
+    def saldo(self):
+        return self._saldo
+
+    @saldo.setter
+    def saldo(self, value):
+        # Validar no-negativo
+        if value < 0:
+            raise ValueError("El saldo no puede ser negativo")
+        self._saldo = value
+
+# Explicación:
+# saldo se accede como propiedad.
+# Si se intenta asignar un valor negativo, lanza ValueError.
+
+
+# 12) Propiedad de solo lectura
+class Termometro:
+    def __init__(self, temperatura_c):
+        self._c = float(temperatura_c)
+
+    @property
+    def temperatura_f(self):
+        # Fórmula: F = C * 9/5 + 32
+        return self._c * 9/5 + 32
+
+# Explicación:
+# temperatura_f se calcula en base a _c.
+# No tiene setter, así que es de solo lectura.
+
+
+# 13) Invariante con tipo
+class Usuario:
+    def __init__(self, nombre):
+        self.nombre = nombre
+
+    @property
+    def nombre(self):
+        return self._nombre
+
+    @nombre.setter
+    def nombre(self, value):
+        if not isinstance(value, str):
+            raise TypeError("nombre debe ser str")
+        self._nombre = value
+
+# Explicación:
+# El atributo siempre debe ser str.
+# Si se asigna otro tipo, se lanza TypeError.
+
+
+# 14) Encapsulación de colección
+class Registro:
+    def __init__(self):
+        self.__items = []
+
+    def add(self, x):
+        self.__items.append(x)
+
+    @property
+    def items(self):
+        # Se devuelve como tupla para que sea inmutable solo para lectura
+        return tuple(self.__items)
+
+# Explicación:
+# __items está encapsulada (privada).
+# items expone una copia inmutable (tupla).
+# Así no se puede modificar desde fuera.

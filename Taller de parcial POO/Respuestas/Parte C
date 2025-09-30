@@ -1,0 +1,127 @@
+#Autor: Daniel Niño
+"""
+Parte C - Diseño y refactor
+Taller POO en Python
+"""
+
+# 15) Refactor a encapsulación con validación
+class Motor:
+    def __init__(self, velocidad):
+        self._velocidad = 0
+        self.velocidad = velocidad
+
+    @property
+    def velocidad(self):
+        return self._velocidad
+
+    @velocidad.setter
+    def velocidad(self, v):
+        if not (0 <= v <= 200):
+            raise ValueError("La velocidad debe estar entre 0 y 200")
+        self._velocidad = v
+
+# Explicación:
+# - velocidad ya no es acceso directo.
+# - Se valida que esté en el rango 0–200.
+
+
+# 16) Elección de convención
+"""
+Explicación:
+- Usaría _atributo cuando quiero indicar que es "interno", pero sigue accesible 
+  si el programador lo necesita. Es solo convención.
+- Usaría __atributo cuando quiero ocultarlo de forma más fuerte (name mangling), 
+  por ejemplo para evitar colisiones en herencia.
+"""
+
+
+# 17) Detección de fuga de encapsulación
+class Buffer:
+    def __init__(self, data):
+        self._data = list(data)
+
+    def get_data(self):
+        # CORREGIDO: devolver copia inmutable
+        return tuple(self._data)
+
+"""
+Explicación:
+- En la versión original, get_data devolvía la lista interna directamente.
+- Eso permitía modificarla desde fuera, rompiendo la encapsulación.
+- Ahora devuelve una tupla, que es inmutable.
+"""
+
+
+# 18) Herencia y name mangling
+class A:
+    def __init__(self):
+        self.__x = 1
+
+class B(A):
+    def get(self):
+        return self._A__x  # corrección: usar name mangling
+
+"""
+Explicación:
+- __x en A se convierte en _A__x.
+- Si en B intento acceder como self.__x, falla porque Python lo renombra a _B__x.
+- La forma correcta es self._A__x.
+"""
+
+
+# 19) Composición y fachada
+class _Repositorio:
+    def __init__(self):
+        self._datos = {}
+
+    def guardar(self, k, v):
+        self._datos[k] = v
+
+    def _dump(self):
+        return dict(self._datos)
+
+class Servicio:
+    def __init__(self):
+        self.__repo = _Repositorio()
+
+    def guardar(self, k, v):
+        # Exponer solo el método seguro
+        return self.__repo.guardar(k, v)
+
+
+#Explicación:
+#La clase Servicio compone un _Repositorio interno.
+#No se expone __repo ni _dump, solo guardar.
+#Esto evita que el usuario acceda a métodos inseguros.
+
+
+
+# 20) Mini-kata: ContadorSeguro
+class ContadorSeguro:
+    def __init__(self):
+        self._n = 0
+
+    def inc(self):
+        self._n += 1
+        self.__log()
+
+    @property
+    def n(self):
+        return self._n
+
+    def __log(self):
+        print("tick")
+
+# Demostración de uso
+c = ContadorSeguro()
+c.inc()  # tick
+c.inc()  # tick
+print(c.n)  # 2
+
+
+#Explicación:
+#_n es el contador (protegido).
+#inc() incrementa el contador y llama a __log().
+#__log es "privado" (name mangling), imprime "tick".
+#n es de solo lectura, muestra el valor actual.
+

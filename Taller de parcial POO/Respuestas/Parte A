@@ -1,0 +1,146 @@
+#Autor : Daniel Niño
+"""
+Parte A - Conceptos y lectura de código
+Taller POO en Python
+"""
+
+# 1) Atributos accesibles
+class A:
+    x = 1
+    _y = 2
+    __z = 3
+
+a = A()
+
+# Explicación:
+# - a.x -> accesible osea público
+# - a._y -> accesible, aunque se considera "protegido" por convención
+# - a.__z -> no existe así, porque __z se convierte en _A__z
+# - a._A__z -> accesible gracias al name mangling
+print(a.x, a._y, a._A__z)
+
+
+# 2) Salida del programa
+class A2:
+    def __init__(self):
+        self.__secret = 42
+
+a2 = A2()
+# Explicación:
+# - '__secret' no existe como tal -> hasattr(a2, '__secret') = False
+# - realmente se guarda como '_A2__secret' -> hasattr(a2, '_A2__secret') = True
+print(hasattr(a2, '__secret'), hasattr(a2, '_A2__secret'))  # False True
+
+
+# 3) V/F
+# a) "El prefijo _ impide el acceso desde fuera de la clase."
+#    FALSO. Es solo convención.
+# b) "El prefijo __ hace imposible acceder al atributo."
+#    FALSO. Aplica name mangling, se puede acceder con _Clase__atributo.
+# c) "El name mangling depende del nombre de la clase."
+#    VERDADERO. El nombre interno cambia según la clase.
+
+
+# 4) Lectura de código con herencia
+class Base:
+    def __init__(self):
+        self._token = "abc"
+
+class Sub(Base):
+    def reveal(self):
+        return self._token
+
+# Explicación:
+# - _token es "protegido" por convención, pero sigue accesible en la subclase.
+# - Por eso no da error y se imprime "abc".
+print(Sub().reveal())  # abc
+
+
+# 5) Name mangling en herencia
+class Base2:
+    def __init__(self):
+        self.__v = 1
+
+class Sub2(Base2):
+    def __init__(self):
+        super().__init__()
+        self.__v = 2
+
+    def show(self):
+        return (self.__v, self._Base2__v)
+
+# Explicación:
+# - En Base2: __v -> _Base2__v
+# - En Sub2: __v -> _Sub2__v
+# - Son dos atributos distintos, por eso la salida es (2,1).
+print(Sub2().show())  # (2, 1)
+
+
+# 6) Error con __slots__
+class Caja:
+    __slots__ = ('x',)
+
+c = Caja()
+c.x = 10
+# Explicación:
+# - __slots__ limita los atributos permitidos.
+# - Solo puede existir "x".
+# - Si intentamos c.y = 20, da AttributeError.
+# c.y = 20  # AttributeError
+
+
+# 7) Atributo protegido por convención
+class B:
+    def __init__(self):
+        self._dato = 99  # protegido por convención
+
+
+# 8) Métodos privados y name mangling
+class M:
+    def __init__(self):
+        self._state = 0
+
+    def _step(self):
+        self._state += 1
+        return self._state
+
+    def __tick(self):
+        return self._step()
+
+m = M()
+# Explicación:
+# - hasattr(m, '_step') -> True (existe tal cual)
+# - hasattr(m, '__tick') -> False (se convirtió en _M__tick)
+# - hasattr(m, '_M__tick') -> True
+print(hasattr(m, '_step'), hasattr(m, '__tick'), hasattr(m, '_M__tick'))  # True False True
+
+
+# 9) Acceso a __data con name mangling
+class S:
+    def __init__(self):
+        self.__data = [1, 2]
+
+    def size(self):
+        return len(self.__data)
+
+s = S()
+# Explicación:
+# - __data se convierte en _S__data.
+# - Podemos acceder con ese nombre interno.
+print(s._S__data)  # [1, 2]
+
+
+# 10) Uso de dir() y mangling
+class D:
+    def __init__(self):
+        self.__a = 1
+        self._b = 2
+        self.c = 3
+
+d = D()
+names = [n for n in dir(d) if 'a' in n]
+print(names)
+# Explicación:
+# - '__a' no aparece, porque se convierte en '_D__a'.
+# - 'a' no existe como tal.
+# - Lo que sí aparece en dir() es '_D__a'.
